@@ -1,16 +1,22 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <string>
+#include <iomanip>
 using namespace std;
 
 //TODO
 //
-//getters setters
+//getters setters		--done
 //Copy constructor		--done
 //Overload =			--done
-//overload << >>
-//Overload []  (+,-,* or /), ++ or -- (with the 2 forms)the cast operator (to any type) explicitly or implicitly
-//			the negation operator !, a conditional operator (<.>,=<,>=), operator for testing equality between 2 objects ==
+//overload << >>		--done
+//Overload []			--done 
+//	(+,-,* or /)		--done
+//	++ or -- (with the 2 forms)
+//	the cast operator (to any type) explicitly or implicitly	--done
+//	the negation operator !										--(1/3)
+//	a conditional operator (<.>,=<,>=),							--done
+//	operator for testing equality between 2 objects ==			--
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------VENUE CLASS----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +28,7 @@ class Venue {
 	char Description[30];
 
 public:
-	// Default Constructor + Constructor with parameters
+	// Default Constructor + Constructor with parameters --------------------------------------------------------------------------------------------------------------------------------------
 	Venue(const int id, const char* VenueName = "", const int TotalCapacity = 0, const char description[30] = "")
 		: id(id), TotalCapacity(TotalCapacity) {
 		this->name = new char[strlen(VenueName) + 1];
@@ -30,7 +36,7 @@ public:
 		strcpy(this->Description, description);
 	}
 
-	// Copy Constructor
+	// Copy Constructor --------------------------------------------------------------------------------------------------------------------------------------
 	Venue(const Venue& o) : id(o.id), TotalCapacity(o.TotalCapacity) {
 		if (o.name != nullptr) {
 			this->name = new char[strlen(o.name) + 1];
@@ -42,7 +48,7 @@ public:
 		strcpy(this->Description, o.Description);
 	}
 
-	// Operator =
+	// Operator = --------------------------------------------------------------------------------------------------------------------------------------
 	Venue& operator=(const Venue& o) {
 		if (this != &o) {
 			if (this->name != nullptr) {
@@ -61,14 +67,14 @@ public:
 		return *this;
 	}
 
-	// Destructor
+	// Destructor --------------------------------------------------------------------------------------------------------------------------------------
 	~Venue() {
 		if (this->name != nullptr) {
 			delete[] this->name;
 		}
 	}
 
-	//getters
+	// Getters --------------------------------------------------------------------------------------------------------------------------------------
 	int getId() const {
 		return this->id;
 	}
@@ -83,7 +89,7 @@ public:
 			return nullptr;
 	}
 
-	int getTotalCapacity() const {
+	const int& getTotalCapacity() const {
 		return this->TotalCapacity;
 	}
 
@@ -91,9 +97,9 @@ public:
 		return this->Description;
 	}
 
-	// Setters
+	// Setters --------------------------------------------------------------------------------------------------------------------------------------
 	void setName(const char* newName) {
-		if (strlen(newName) <= 0) {
+		if (newName == nullptr || strlen(newName) == 0) {
 			throw "The venue must have a name of at least one Character";
 		}
 		else {
@@ -115,9 +121,72 @@ public:
 		}
 		
 	}
+
+	// Operators ----------------------------------------------------------------------------------------------------------------------------------
+	
+	const char& operator[](int index) const {
+		if (index < 0 || index >= sizeof(Description)) {
+			throw out_of_range("Index out of range");
+		}
+		return Description[index];
+	}
+
+	Venue operator+(const Venue& other) const {
+		Venue resultVenue = *this;
+
+		char* combinedName = new char[strlen(name) + strlen(other.name) + 1];
+		strcpy(combinedName, name);
+		strcat(combinedName, other.name);
+		resultVenue.setName(combinedName);
+		delete[] combinedName;
+
+		return resultVenue;
+	}
+
+	operator int() const {
+		int copy = this->getTotalCapacity();
+		return copy;
+	}
+
+	bool operator<(const Venue& other) const {
+		return this->TotalCapacity < other.TotalCapacity;
+	}
+
+	bool operator>(const Venue& other) const {
+		return this->TotalCapacity > other.TotalCapacity;
+	}
+
+	bool operator==(const Venue& other) const {
+		return(this->TotalCapacity == other.TotalCapacity) &&
+			(strcmp(this->name, other.name) == 0) &&
+			(strcmp(this->Description, other.Description) == 0);
+	}
+
 };
 
+// Overload <<
+ostream& operator<<(ostream& os, const Venue& venue) {
+	os << "Venue ID: " << venue.getId() << endl
+		<< "Venue Name: " << venue.getName() << endl
+		<< "Total Capacity: " << venue.getTotalCapacity() << endl
+		<< "Description: " << venue.getDescription() << endl;
+	return os;
+}
 
+// Overload >>
+istream& operator>>(istream& is, Venue& venue) {
+	char name[100], description[30];
+
+	cout << "Enter Venue Name: ";
+	is.getline(name, 100);
+	venue.setName(name);
+
+	cout << "Enter Description: ";
+	is.getline(description, 30);
+	venue.setDescription(description);
+
+	return is;
+}
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,10 +203,11 @@ class Ticket {
 	int SeatsArray[10];
 
 public:
-	//Default Constructor + w/ parameters
-	Ticket(const int id = 0 ,string date = "", bool isValid = false, const char* name = "", int seatsarray[]={}) :id(id) {
+	//Default Constructor + w/ parameters ---------------------------------------------------------------------------------------------------------------------
+	Ticket(int id = 0 ,string date = "", bool isValid = false, const char* name = "", int seatsarray[]={}) :id(id) {
 		this->dateOfTicket = date;
 		this->isValidated = isValid;
+		this->EventName = new char[strlen(name) + 1];
 		strcpy(this->EventName, name);
 		this->NrOfSeats = sizeof(seatsarray);
 		for (int i=0; i < this->NrOfSeats; i++) {
@@ -153,7 +223,7 @@ public:
 		};
 	}
 
-	//Copy Constructor
+	//Copy Constructor --------------------------------------------------------------------------------------------------------------------------------------
 	Ticket(const Ticket& o) :id(o.id){
 		if (o.EventName != nullptr) {
 			this->EventName = new char[strlen(o.EventName) + 1];
@@ -176,7 +246,7 @@ public:
 		};
 	}
 
-	// Operator =
+	// Operator = --------------------------------------------------------------------------------------------------------------------------------------
 	Ticket& operator=(const Ticket& o) {
 		if (this != &o) {
 			if (this->EventName != nullptr) {
@@ -208,14 +278,14 @@ public:
 		return *this;
 	}
 
-	//Destructor
+	//Destructor --------------------------------------------------------------------------------------------------------------------------------------
 	~Ticket() {
 		if (this->EventName != nullptr) {
 			delete[]this->EventName;
 		}
 	}
 
-	// Getters
+	// Getters --------------------------------------------------------------------------------------------------------------------------------------
 	int getId() const {
 		return id;
 	}
@@ -234,7 +304,7 @@ public:
 		return dateOfTicket;
 	}
 
-	bool getIsValidated() const {
+	bool CheckValidation() const {
 		return isValidated;
 	}
 
@@ -246,7 +316,7 @@ public:
 		return SeatsArray;
 	}
 
-	// Setters
+	// Setters --------------------------------------------------------------------------------------------------------------------------------------
 	void setEventName(const char* newName) {
 		if (strlen(newName) <= 0) {
 			throw "Event must have a name of at leas one Character";
@@ -260,7 +330,7 @@ public:
 		}
 	}
 
-	// Testing for valid dd/mm/yyyy format
+	// Testing for valid dd/mm/yyyy format 
 	bool isDayMonthYear(const std::string& date) const {
 		if (date.size() != 10) {
 			return false;
@@ -285,7 +355,7 @@ public:
 		}
 	}
 
-	void setIsValidated(bool newIsValidated) {
+	void setValidation (bool newIsValidated) {
 		if (this->isValidated == newIsValidated) {
 			throw "Ticket already has that value. Give it another True/Flase value";
 		}
@@ -309,13 +379,132 @@ public:
 			SeatsArray[i] = newSeatsArray[i];
 		};
 	}
+
+	//Operators
+	const int& operator[](int index) const {
+		if (index < 0 || index >= NrOfSeats) {
+			throw out_of_range("Index out of range");
+		}
+		return SeatsArray[index];
+	}
+
+	Ticket operator+(const Ticket& other) const {
+		Ticket resultTicket = *this;
+		if (this->NrOfSeats + other.NrOfSeats >= 10 || this->dateOfTicket != other.dateOfTicket) {
+			throw "These Tickets cannot be combined because theire Nr seats would exceed 10 or they are in different dates";
+		}
+		else {
+			resultTicket.EventName = new char[strlen(EventName) + strlen(other.EventName) + 1];
+			strcpy(resultTicket.EventName, EventName);
+			strcat(resultTicket.EventName, other.EventName);
+
+			for (int i = 0; i < this->NrOfSeats + other.NrOfSeats;i++) {
+				if (i <= this->NrOfSeats)
+					resultTicket.SeatsArray[i] = this->SeatsArray[i];
+				else
+					resultTicket.SeatsArray[i] = other.SeatsArray[i];
+			}
+
+			resultTicket.NrOfSeats = this->NrOfSeats + other.NrOfSeats;
+
+			return resultTicket;
+		}
+	}
+
+	operator bool() const {
+		bool copy = CheckValidation();
+		return isValidated;
+	}
+
+	bool operator<(const Ticket& other) const {
+		return this->NrOfSeats < other.NrOfSeats;
+	}
+
+	bool operator>(const Ticket& other) const {
+		return this->NrOfSeats > other.NrOfSeats;
+	}
+
+	bool operator!() const {
+		return !isValidated;
+	}
+
+	bool operator==(const Ticket& other) const {
+		bool flagTest=true;
+		if (NrOfSeats != other.NrOfSeats) flagTest = false;
+		else {
+			for (int i = 0;i < NrOfSeats;i++) {
+				if (SeatsArray[i] != other.SeatsArray[i])
+				{
+					flagTest = false;
+					i = NrOfSeats;
+				}
+			}
+		}
+		return (dateOfTicket == other.dateOfTicket) &&
+			(isValidated == other.isValidated) &&
+			(strcmp(EventName, other.EventName) == 0) && flagTest;
+	}
 };
 
 const int Ticket::MAX_NR_OF_SEATS = 300;
 int Ticket::TotalNrOfSeats = 0;
 
+//Overload <<
+ostream& operator<<(ostream& os, const Ticket& ticket) {
+	os << "Ticket ID: " << ticket.getId() << endl
+		<< "Event Name: " << ticket.getEventName() << endl
+		<< "Date of Ticket: " << ticket.getDateOfTicket() << endl
+		<< "Is Validated: ";
+	if (ticket.CheckValidation() == true) os << "Yes";
+	else os << "No" << endl;
+	os << "Number of Seats: " << ticket.getNrOfSeats() << endl
+		<< "Seats Array: ";
+
+	const int* seatsArray = ticket.getSeatsArray();
+	for (int i = 0; i < ticket.getNrOfSeats(); ++i) {
+		os << seatsArray[i] << " ";
+	}
+
+	os << endl;
+	return os;
+}
+
+// Overload >> 
+istream& operator>>(istream& is, Ticket& ticket) {
+	int nrOfSeats;
+	char eventName[100];
+	string dateOfTicket;
+	bool isValidated;
+	int seatsArray[10];
+
+
+	cout << "Enter Event Name: ";
+	is.getline(eventName, 100);
+	ticket.setEventName(eventName);
+
+	cout << "Enter Date of Ticket (dd/mm/yyyy): ";
+	is >> dateOfTicket;
+	ticket.setDateOfTicket(dateOfTicket);
+
+	cout << "Is Validated (1 for Yes, 0 for No): ";
+	is >> isValidated;
+	ticket.setValidation(isValidated);
+
+	cout << "Enter Number of Seats (between 1 and 10): ";
+	is >> nrOfSeats;
+	ticket.setNrOfSeats(nrOfSeats);
+
+	cout << "Enter Seats Array: ";
+	for (int i = 0; i < nrOfSeats; i++) {
+		is >> seatsArray[i];
+	}
+	ticket.setSeatsArray(seatsArray);
+
+	return is;
+}
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------ATENDEE CLASS----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------EVENT CLASS----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 enum Type {
 	zero,
@@ -334,9 +523,10 @@ class Event {
 	int NrOfArtists;
 
 public:
-	//Constructor With Parameters & Default Constructor
+	//Constructor With Parameters & Default Constructor --------------------------------------------------------------------------------------------------------
 	Event(Type eventtype = zero, const char* location = "", string artistList[] = {}, int id=0): EventId(id) {
 		this->EventType = eventtype;
+		this->Location = new char[strlen(location)+1];
 		strcpy(this->Location, location);
 		this->NrOfArtists = sizeof(artistList);
 		if (NrOfArtists > 10) {
@@ -347,7 +537,23 @@ public:
 		};
 	};
 
-	//Copy Constructor
+	Event(Type eventtype = zero, const char* location = "", const string artistList[] = {}, int artistListSize = 0, int id = 0) : EventId(id) {
+		this->EventType = eventtype;
+		this->Location = new char[strlen(location) + 1];
+		strcpy(this->Location, location);
+		this->NrOfArtists = artistListSize;
+
+		if (NrOfArtists > 10) {
+			throw "Too Many Artists";
+		}
+
+		for (int i = 0; i < NrOfArtists; ++i) {
+			this->ArtistsList[i] = artistList[i];
+		}
+	}
+
+
+	//Copy Constructor --------------------------------------------------------------------------------------------------------------------------------------
 	Event(const Event& o) : EventId(o.EventId) {
 		if (o.Location != nullptr) {
 			this->Location = new char[strlen(o.Location) + 1];
@@ -363,7 +569,7 @@ public:
 		}
 	}
 
-	//Operator =
+	//Operator = --------------------------------------------------------------------------------------------------------------------------------------
 	Event& operator=(const Event& o) {
 		if (this != &o) {
 			if (this->Location != nullptr) {
@@ -385,14 +591,14 @@ public:
 		return *this;
 	}
 
-	//Destructor
+	//Destructor--------------------------------------------------------------------------------------------------------------------------------------
 	~Event() {
 		if (this->Location != nullptr) {
 			delete[] this->Location;
 		}
 	}
 	
-	// Getters
+	// Getters --------------------------------------------------------------------------------------------------------------------------------------
 	Type getEventType() const {
 		return EventType;
 	}
@@ -438,7 +644,7 @@ public:
 		return ArtistsList;
 	}
 
-	// Setters
+	// Setters --------------------------------------------------------------------------------------------------------------------------------------
 	void setEventType(Type newEventType) {
 		if (newEventType == zero) {
 			throw "Event Type cannot be zero. Use a different value";
@@ -481,11 +687,155 @@ public:
 		}
 	}
 
+	// Operators--------------------------------------------------------------------------------------------------------------------------------------
+	const string& operator[](int index) const {
+		if (index < 0 || index >= NrOfArtists) {
+			throw out_of_range("Index out of range");
+		}
+		return ArtistsList[index];
+	}
+
+	Event operator+(const Event& other) const {
+		Event resultEvent = *this;
+		if (this->NrOfArtists + other.NrOfArtists >= 10) {
+			throw "These Events cannot be combined because theire Nr of artists would exceed 10";
+		}
+		else {
+			resultEvent.Location = new char[strlen(Location) + strlen(other.Location) + 1];
+			strcpy(resultEvent.Location, Location);
+			strcat(resultEvent.Location, other.Location);
+
+			for (int i = 0; i < this->NrOfArtists + other.NrOfArtists;i++) {
+				if (i <= this->NrOfArtists)
+					resultEvent.ArtistsList[i] = this->ArtistsList[i];
+				else
+					resultEvent.ArtistsList[i] = other.ArtistsList[i];
+			}
+
+			resultEvent.NrOfArtists = this->NrOfArtists + other.NrOfArtists;
+				
+			return resultEvent;
+		}
+	}
+
+	operator Type() const{
+		Type copy = getEventType();
+		return copy;
+	}
+
+	bool operator<(const Event& other) const {
+		return this->NrOfArtists < other.NrOfArtists;
+	}
+
+	bool operator>(const Event& other) const {
+		return this->NrOfArtists > other.NrOfArtists;
+	}
+
+	bool operator==(const Event& other) const {
+		bool flagTest = true;
+		if (NrOfArtists != other.NrOfArtists) flagTest = false;
+		else {
+			for (int i = 0;i < NrOfArtists;i++) {
+				if (ArtistsList[i] != other.ArtistsList[i])
+				{
+					flagTest = false;
+					i = NrOfArtists;
+				}
+			}
+		}
+		return (EventType == other.EventType) &&
+			(EventId == other.EventId) &&
+			(strcmp(Location, other.Location) == 0) && flagTest;
+	}
 };
 
+// Overload <<
+ostream& operator<<(ostream& os, const Event& event) {
+	os << "Event ID: " << event.getEventId() << endl
+		<< "Event Type: " << event.getEventTypeAsString() << endl
+		<< "Location: " << event.getLocation() << endl
+		<< "Number of Artists: " << event.getNrOfArtists() << endl
+		<< "Artists List: ";
+
+	const string* artistsList = event.getArtistsList();
+	for (int i = 0; i < event.getNrOfArtists(); ++i) {
+		os << artistsList[i] << " ";
+	}
+
+	os << endl;
+	return os;
+}
+
+// Overload >>
+istream& operator>>(istream& is, Event& event) {
+	int nrOfArtists;
+	char location[100];
+	string artistsList[10];
+
+	int eventType;
+	cout << "Enter event type (0 for zero,1 for concert,2 for opera,3 for theater,4 for ballet,5 for movie";
+	is >> eventType;
+	switch (eventType) {
+	case 0:
+		event.setEventType(zero);
+	case 1:
+		event.setEventType(concert);
+	case 2:
+		event.setEventType(opera);
+	case 3:
+		event.setEventType(theater);
+	case 4:
+		event.setEventType(ballet);
+	case 5:
+		event.setEventType(movie);
+	}
+
+	cout << "Enter Location: ";
+	is.getline(location, 100);
+	event.setLocation(location);
+
+	cout << "Enter Number of Artists: ";
+	is >> nrOfArtists;
+	event.setNrOfArtists(nrOfArtists);
+
+	cout << "Enter Artists List: ";
+	for (int i = 0; i < nrOfArtists; ++i) {
+		is >> artistsList[i];
+	}
+	event.setArtistsList(artistsList);
+
+	return is;
+}
 
 int main() {
-	std::cout << "Hello!";
+	// Venue Testing
+	Venue venue1(1, "Venue1", 100, "Description1");
+	Venue venue2(2, "Venue2", 150, "Description2");
 
-	
+	cout << "Venue 1: \n" << venue1 << endl;
+	cout << "Venue 2: \n" << venue2 << endl;
+
+	Venue venue3 = venue1 + venue2;
+	cout << "Combined Venue: \n" << venue3 << endl;
+
+	// Ticket Testing
+	Ticket ticket1(1, "01/01/2023", true, "Event1", { 1, 2, 3 });
+	Ticket ticket2(2, "02/01/2023", false, "Event2", { 4, 5, 6 });
+
+	cout << "Ticket 1: \n" << ticket1 << endl;
+	cout << "Ticket 2: \n" << ticket2 << endl;
+
+	Ticket ticket3 = ticket1 + ticket2;
+	cout << "Combined Ticket: \n" << ticket3 << endl;
+
+	// Event Testing
+	string ArtistList1 = { "Artist1", "Artist2" };
+	Event event1(Type::concert,"Location1", ArtistList1,1);
+	Event event2(opera, "Location2", {"Artist3", "Artist4" }, 2);
+
+	cout << "Event 1: \n" << event1 << endl;
+	cout << "Event 2: \n" << event2 << endl;
+
+	Event event3 = event1 + event2;
+	cout << "Combined Event: \n" << event3 << endl;
 }
