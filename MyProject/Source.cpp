@@ -872,16 +872,13 @@ istream& operator>>(istream& is, Event& event) {
 }
 
 int main() {
-	// ... (your existing code)
 
-    /*Venue Testing*/
 	Venue venue1(1, "Venue1", 100, "Description1");
 	Venue venue2(2, "Venue2", 150, "Description2");
 
 	venue1.oneLineDisplay();
 	venue2.oneLineDisplay();
 
-	// Ticket Testing
 	vector<int> seatsArray = { 1, 2, 3 };
 	Ticket ticket1(1, "01/01/2023", true, "Event1", seatsArray);
 	ticket1.oneLineDisplay();
@@ -890,15 +887,12 @@ int main() {
 
 	ticket2.oneLineDisplay();
 
-	// Event Testing
 	vector<string> ArtistList1 = { "Artist1", "Artist2" };
 	Event event1(concert, "Location1", ArtistList1, 1);
 	Event event2(opera, "Location2", { "Artist3", "Artist4" }, 2);
 
 	event1.oneLineDisplay();
 	event2.oneLineDisplay();
-
-	// ... (your existing code)
 
 	return 0;
 }
